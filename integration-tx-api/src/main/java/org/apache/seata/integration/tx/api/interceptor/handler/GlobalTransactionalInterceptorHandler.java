@@ -272,6 +272,9 @@ public class GlobalTransactionalInterceptorHandler extends AbstractProxyInvocati
         }
     }
 
+    /**
+     *  从 method 或者 targetClass 上找到 GlobalLockConfig 注解配置信息。
+     */
     public GlobalLockConfig getGlobalLockConfig(Method method, Class<?> targetClass) {
         final GlobalLock globalLockAnno = getAnnotation(method, targetClass, GlobalLock.class);
         if (globalLockAnno != null) {
@@ -284,6 +287,9 @@ public class GlobalTransactionalInterceptorHandler extends AbstractProxyInvocati
         }
     }
 
+    /**
+     * 从 method 或者 targetClass 上找到 GlobalTransactional 注解配置信息。
+     */
     public AspectTransactional getAspectTransactional(Method method, Class<?> targetClass) {
         final GlobalTransactional globalTransactionalAnnotation =
             getAnnotation(method, targetClass, GlobalTransactional.class);

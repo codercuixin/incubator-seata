@@ -49,7 +49,7 @@ public class XID {
 
     /**
      * Generate xid string.
-     *
+     * 这个 xid 就是 ip+port + transactionId (UUID)
      * @param tranId the tran id
      * @return the string
      */

@@ -40,6 +40,10 @@ import java.util.concurrent.TimeoutException;
 
 /**
  * The type Default transaction manager.
+ *  transaction manager 由业务端间接使用（一般通过注解）。
+ *  这个类负责发送请求给 transaction coordinator(tc)
+ *  也就是 tm 只和 tc 之间通信。另外 resource manger(rm) 只和 tc 之间通信。
+ *  综上 tm 和 rm 不会直接通信，而是通过 tc 间接地通信。
  *
  */
 public class DefaultTransactionManager implements TransactionManager {

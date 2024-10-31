@@ -22,6 +22,9 @@ import org.apache.seata.core.context.RootContext;
 import org.apache.seata.core.exception.TransactionException;
 import org.apache.seata.core.model.GlobalStatus;
 import org.apache.seata.core.model.TransactionManager;
+import org.apache.seata.core.protocol.transaction.GlobalBeginRequest;
+import org.apache.seata.core.protocol.transaction.GlobalBeginResponse;
+import org.apache.seata.core.rpc.RpcContext;
 import org.apache.seata.tm.TransactionManagerHolder;
 import org.apache.seata.tm.api.transaction.SuspendedResourcesHolder;
 import org.slf4j.Logger;
@@ -41,7 +44,7 @@ public class DefaultGlobalTransaction implements GlobalTransaction {
     private static final int DEFAULT_GLOBAL_TX_TIMEOUT = 60000;
 
     private static final String DEFAULT_GLOBAL_TX_NAME = "default";
-
+    //这里注入的是 同一模块中的 DefaultTransactionManager
     private TransactionManager transactionManager;
 
     private String xid;
@@ -110,6 +113,10 @@ public class DefaultGlobalTransaction implements GlobalTransaction {
             throw new IllegalStateException("Global transaction already exists," +
                 " can't begin a new global transaction, currentXid = " + currentXid);
         }
+        /**
+         * 这里注入的是同一模块中的 {@link org.apache.seata.tm.DefaultTransactionManager#begin}， 也就是要发 global begin 请求给 transaction coordinator server 的。
+         * server 收到请求会在 global_table 写入一条数据，详情请看 {@link org.apache.seata.server.coordinator.DefaultCoordinator#doGlobalBegin}
+         */
         xid = transactionManager.begin(null, null, name, timeout);
         status = GlobalStatus.Begin;
         RootContext.bind(xid);
@@ -137,6 +144,11 @@ public class DefaultGlobalTransaction implements GlobalTransaction {
             while (retry > 0) {
                 try {
                     retry--;
+                    /**
+                     * tm 发送请求 global commit request 给 tc server
+                     * {@link org.apache.seata.tm.DefaultTransactionManager#commit}
+                     *
+                     */
                     status = transactionManager.commit(xid);
                     break;
                 } catch (Throwable ex) {

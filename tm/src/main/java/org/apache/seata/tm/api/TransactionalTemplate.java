@@ -46,7 +46,7 @@ public class TransactionalTemplate {
 
     /**
      * Execute object.
-     *
+     * 这个函数最为关键了
      * @param business the business
      * @return the object
      * @throws TransactionalExecutor.ExecutionException the execution exception
@@ -114,7 +114,7 @@ public class TransactionalTemplate {
 
             // set current tx config to holder
             GlobalLockConfig previousConfig = replaceGlobalLockConfig(txInfo);
-            
+
             if (tx.getGlobalTransactionRole() == GlobalTransactionRole.Participant) {
                 LOGGER.info("join into a existing global transaction,xid={}", tx.getXid());
             }
@@ -122,6 +122,7 @@ public class TransactionalTemplate {
             try {
                 // 2. If the tx role is 'GlobalTransactionRole.Launcher', send the request of beginTransaction to TC,
                 //    else do nothing. Of course, the hooks will still be triggered.
+                // tm 发送 global begin request 给 tc
                 beginTransaction(txInfo, tx);
 
                 Object rs;
@@ -135,6 +136,7 @@ public class TransactionalTemplate {
                 }
 
                 // 4. everything is fine, commit.
+                // tm 发送 global commit request 给 tc
                 commitTransaction(tx, txInfo);
 
                 return rs;
@@ -200,6 +202,9 @@ public class TransactionalTemplate {
         }
     }
 
+    /**
+     * tm 发送 global commit request 给 tc
+     */
     private void commitTransaction(GlobalTransaction tx, TransactionInfo txInfo)
             throws TransactionalExecutor.ExecutionException, TransactionException {
         if (tx.getGlobalTransactionRole() != GlobalTransactionRole.Launcher) {

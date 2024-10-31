@@ -48,6 +48,10 @@ public class DistributedLockerFactory {
                     DistributedLocker distributedLocker = null;
                     try {
                         if (!"file".equals(lockerType)) {
+                            /**
+                             * todo 研究下这个 EnhancedServiceLoader。
+                             * 应该就是调用 Java 反射，根据 lockType 和 class 初始化一个子类的实例出来
+                             */
                             distributedLocker = EnhancedServiceLoader.load(DistributedLocker.class, lockerType);
                         }
                     } catch (EnhancedServiceNotFoundException ex) {

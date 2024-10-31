@@ -41,7 +41,7 @@ import static org.apache.seata.core.model.LockStatus.Locked;
 
 /**
  * The type Branch session.
- *
+ * branch session 其实是 branch_table 的封装
  */
 public class BranchSession implements Lockable, Comparable<BranchSession>, SessionStorable {
 

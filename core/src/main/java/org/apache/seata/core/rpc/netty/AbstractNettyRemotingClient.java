@@ -67,7 +67,8 @@ import static org.apache.seata.common.exception.FrameworkErrorCode.NoAvailableSe
 
 /**
  * The netty remoting client.
- *
+ * remoting client 具体分为 tm (transaction manager), rm(resource manager)
+ * 这里定义通用的代码
  */
 public abstract class AbstractNettyRemotingClient extends AbstractNettyRemoting implements RemotingClient {
 

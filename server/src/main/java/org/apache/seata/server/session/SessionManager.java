@@ -127,7 +127,8 @@ public interface SessionManager extends Disposable {
 
     /**
      * On begin.
-     *
+     * 将 global session 写入底层存储，raft, db, redis,file
+     * 应该使用 addGlobalSession 替代。
      * @param globalSession the global session
      * @throws TransactionException the transaction exception
      */

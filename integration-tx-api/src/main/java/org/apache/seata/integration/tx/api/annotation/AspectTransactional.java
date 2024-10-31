@@ -21,9 +21,11 @@ import org.apache.seata.common.LockStrategyMode;
 import org.apache.seata.common.util.StringUtils;
 import org.apache.seata.tm.api.transaction.Propagation;
 
-
+/**
+ * 存储 GlobalTransactional 注解信息的 pojo
+ */
 public class AspectTransactional {
-    
+
     /**
      * Global transaction timeoutMills in MILLISECONDS.
      */

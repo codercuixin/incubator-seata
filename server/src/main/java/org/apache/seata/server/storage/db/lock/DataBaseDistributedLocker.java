@@ -125,6 +125,7 @@ public class DataBaseDistributedLocker implements DistributedLocker {
         try {
             connection = distributedLockDataSource.getConnection();
             originalAutoCommit = connection.getAutoCommit();
+            //因为可能分为查询和插入，所以设置 auto_commit 为 false
             connection.setAutoCommit(false);
 
             DistributedLockDO lockFromDB = getDistributedLockDO(connection, distributedLockDO.getLockKey());

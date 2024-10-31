@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The type Abstract session manager.
+ *  session manager 分为 database, redis， raft， file 等。
  */
 public abstract class AbstractSessionManager implements SessionManager {
 

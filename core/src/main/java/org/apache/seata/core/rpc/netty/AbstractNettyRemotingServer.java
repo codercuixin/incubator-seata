@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The type abstract remoting server.
- *
+ * 这个类主要负责 tc（transaction coordinator) 与 rm(resource manager)， tm(Transaction Manager)  收发消息
  * @since 1.3.0
  */
 public abstract class AbstractNettyRemotingServer extends AbstractNettyRemoting implements RemotingServer {

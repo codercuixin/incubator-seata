@@ -199,6 +199,7 @@ public abstract class AbstractCore implements Core {
     @Override
     public BranchStatus branchRollback(GlobalSession globalSession, BranchSession branchSession) throws TransactionException {
         try {
+            //给分支事务发送回滚请求
             BranchRollbackRequest request = new BranchRollbackRequest();
             request.setXid(branchSession.getXid());
             request.setBranchId(branchSession.getBranchId());

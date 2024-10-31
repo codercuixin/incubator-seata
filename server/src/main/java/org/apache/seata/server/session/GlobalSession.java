@@ -55,7 +55,7 @@ import static org.apache.seata.core.model.GlobalStatus.Committing;
 
 /**
  * The type Global session.
- *
+ * global session 其实是 global_table 的封装
  */
 public class GlobalSession implements SessionLifecycle, SessionStorable {
 
@@ -219,6 +219,7 @@ public class GlobalSession implements SessionLifecycle, SessionStorable {
         this.status = GlobalStatus.Begin;
         this.beginTime = System.currentTimeMillis();
         this.active = true;
+        //sessionManager onBegin  负责将 global session 写入 db/redis 等。
         SessionHolder.getRootSessionManager().onBegin(this);
         for (SessionLifecycleListener lifecycleListener : lifecycleListeners) {
             lifecycleListener.onBegin(this);
@@ -435,6 +436,7 @@ public class GlobalSession implements SessionLifecycle, SessionStorable {
         this.transactionServiceGroup = transactionServiceGroup;
         this.transactionName = transactionName;
         this.timeout = timeout;
+        // 这个 xid 就是 ip+port + transactionId (UUID)
         this.xid = XID.generateXID(transactionId);
     }
 

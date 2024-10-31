@@ -53,6 +53,9 @@ public class SeataAutoConfiguration {
         return new DefaultFailureHandlerImpl();
     }
 
+    /**
+     * 初始化 GlobalTransactionScanner
+     */
     @Bean
     @DependsOn({BEAN_NAME_SPRING_APPLICATION_CONTEXT_PROVIDER, BEAN_NAME_FAILURE_HANDLER})
     @ConditionalOnMissingBean(GlobalTransactionScanner.class)

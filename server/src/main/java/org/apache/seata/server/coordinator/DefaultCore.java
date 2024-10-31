@@ -135,7 +135,9 @@ public class DefaultCore implements Core {
         throws TransactionException {
         GlobalSession session = GlobalSession.createGlobalSession(applicationId, transactionServiceGroup, name, timeout);
         MDC.put(RootContext.MDC_KEY_XID, session.getXid());
-
+        /**
+         * 收到请求会在 global_table 写入一条数据
+         */
         session.begin();
 
         // transaction start event
@@ -201,6 +203,7 @@ public class DefaultCore implements Core {
             success = getCore(BranchType.SAGA).doGlobalCommit(globalSession, retrying);
         } else {
             List<BranchSession> branchSessions = globalSession.getSortedBranches();
+            //由 tc server 给所有的 branch 发请求，等待所有 branch transaction 都成功。
             Boolean result = SessionHelper.forEach(branchSessions, branchSession -> {
                 // if not retrying, skip the canBeCommittedAsync branches
                 if (!retrying && branchSession.canBeCommittedAsync()) {
@@ -301,7 +304,7 @@ public class DefaultCore implements Core {
         if (!shouldRollBack) {
             return globalSession.getStatus();
         }
-        
+
         boolean rollbackSuccess = doGlobalRollback(globalSession, false);
         return rollbackSuccess ? GlobalStatus.Rollbacked : globalSession.getStatus();
     }
@@ -315,6 +318,7 @@ public class DefaultCore implements Core {
         if (globalSession.isSaga()) {
             success = getCore(BranchType.SAGA).doGlobalRollback(globalSession, retrying);
         } else {
+            // 并发给各个分支事务发回滚请求，让他们都回滚。如果都成功，才成功。
             List<BranchSession> branchSessions = globalSession.getReverseSortedBranches();
             Boolean result = SessionHelper.forEach(branchSessions, branchSession -> {
                 BranchStatus currentBranchStatus = branchSession.getStatus();
@@ -323,6 +327,7 @@ public class DefaultCore implements Core {
                     return CONTINUE;
                 }
                 try {
+                    //发这个分支事务发回滚请求
                     BranchStatus branchStatus = branchRollback(globalSession, branchSession);
                     if (isXaerNotaTimeout(globalSession, branchStatus)) {
                         LOGGER.info("Rollback branch XAER_NOTA retry timeout, xid = {} branchId = {}", globalSession.getXid(), branchSession.getBranchId());
