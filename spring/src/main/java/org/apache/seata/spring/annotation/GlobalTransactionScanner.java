@@ -344,6 +344,10 @@ public class GlobalTransactionScanner extends AbstractAutoProxyCreator
             return false;
         }
 
+        return doScannerCheckers(bean, beanName);
+    }
+
+    private boolean doScannerCheckers(Object bean, String beanName) {
         if (!SCANNER_CHECKER_SET.isEmpty()) {
             for (ScannerChecker checker : SCANNER_CHECKER_SET) {
                 try {
@@ -357,7 +361,6 @@ public class GlobalTransactionScanner extends AbstractAutoProxyCreator
                 }
             }
         }
-
         return true;
     }
 
@@ -513,6 +516,9 @@ public class GlobalTransactionScanner extends AbstractAutoProxyCreator
                     continue;
                 }
                 if (IGNORE_ENHANCE_CHECK_SET.contains(beanDefinition.getBeanClassName())) {
+                    continue;
+                }
+                if (!doScannerCheckers(null, beanDefinition.getBeanClassName())) {
                     continue;
                 }
                 try {

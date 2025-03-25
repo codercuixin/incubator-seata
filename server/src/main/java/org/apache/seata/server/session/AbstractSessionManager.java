@@ -16,6 +16,8 @@
  */
 package org.apache.seata.server.session;
 
+import org.apache.seata.config.ConfigurationFactory;
+import org.apache.seata.core.constants.ConfigurationKeys;
 import org.apache.seata.core.exception.BranchTransactionException;
 import org.apache.seata.core.exception.GlobalTransactionException;
 import org.apache.seata.core.exception.TransactionException;
@@ -29,11 +31,15 @@ import org.apache.seata.server.store.TransactionStoreManager.LogOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.apache.seata.common.DefaultValues.DEFAULT_ROLLBACK_FAILED_UNLOCK_ENABLE;
+
 /**
  * The type Abstract session manager.
  *  session manager 分为 database, redis， raft， file 等。
  */
 public abstract class AbstractSessionManager implements SessionManager {
+    boolean rollbackFailedUnlockEnable = ConfigurationFactory.getInstance().getBoolean(
+        ConfigurationKeys.ROLLBACK_FAILED_UNLOCK_ENABLE, DEFAULT_ROLLBACK_FAILED_UNLOCK_ENABLE);
 
     /**
      * The constant LOGGER.
@@ -158,6 +164,11 @@ public abstract class AbstractSessionManager implements SessionManager {
 
     @Override
     public void onFailEnd(GlobalSession globalSession) throws TransactionException {
+        if (rollbackFailedUnlockEnable) {
+            globalSession.clean();
+            LOGGER.info("xid:{} fail end and remove lock, transaction:{}", globalSession.getXid(), globalSession);
+            return;
+        }
         LOGGER.info("xid:{} fail end, transaction:{}", globalSession.getXid(), globalSession);
     }
 
